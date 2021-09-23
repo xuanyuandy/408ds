@@ -27,6 +27,7 @@ typedef struct TreeNode{
 tnode* build(tnode *root,string &str,int cnt){
     if(cnt < str.size()){
         
+        
     }
 }
 

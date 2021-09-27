@@ -139,6 +139,10 @@ int main(){
     beautyformat(level);
 
 
+    // get the length of the tree in no recursive method
+    
+
+
 
     
 

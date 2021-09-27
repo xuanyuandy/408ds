@@ -11,6 +11,7 @@ a template of binary tree
 #include <sstream>
 #include <algorithm>
 #include <random>
+#include <queue>
 
 using namespace std;
 
@@ -126,6 +127,36 @@ void lastprint(tnode *root){
     beautyformat(level);
 }
 
+// from right to left and from down to up using level traversal
+void leveltraverse(tnode *root,int dep,vector<vector<int> >&res){
+    if(root -> right){
+        leveltraverse(root -> right,dep + 1,res);
+    }
+    if(root -> left){
+        leveltraverse(root -> left,dep + 1,res);
+    }
+    res[dep].push_back(root -> val);
+}
+
+// level traversal without recursive
+void basiclevel(tnode *root){
+    // just use a queue to maintain the dealing order
+    queue<tnode *> q;
+    q.push(root);
+    while(!q.empty()){
+        tnode *tmp = q.front();
+        cout << char(tmp -> val + 'A') << " ";
+        q.pop();
+        if(tmp -> left){
+            q.push(tmp -> left);
+        }
+        if(tmp -> right){
+            q.push(tmp -> right);
+        }
+    }
+    
+}
+
 int main(){
     /* 
     the form of the input is use level traverse and we should display the NULL op for each node
@@ -137,10 +168,23 @@ int main(){
     vector<vector<int> > level(mxdep + 1);
     construct(root,level);
     beautyformat(level);
-
-
-
     
+
+    // do level traverse
+    dfs(root); // find maxdepth
+    vector<vector<int> > res(mxdep + 1);
+    leveltraverse(root,1,res);
+
+    printf("level traversal :\n");
+    for(int i = mxdep;i >= 1;i --){
+        for(int j = 0;j < res[i].size();j ++){
+            int t = res[i][j];
+            cout << char(t + 'A') << " ";
+        }
+    }
+
+    printf("\nbasic level traversal: \n");
+    basiclevel(root);
 
     return 0;
 }

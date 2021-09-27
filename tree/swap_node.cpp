@@ -2,7 +2,6 @@
 this use TreeNode struct to store the binary tree
 we just use the order sequence to build the tree 
 the '#' represent the NULL
-a template of binary tree
 */
 
 #include <iostream>
@@ -11,6 +10,7 @@ a template of binary tree
 #include <sstream>
 #include <algorithm>
 #include <random>
+#include <assert.h>
 
 using namespace std;
 
@@ -119,6 +119,78 @@ void beautyformat(vector<vector<int> > &level){
     }
 }
 
+// from down to up and from right to left level by level
+
+// find sepcific node by its val
+// the main problem is that you must store the whole information of its son sending 
+// and you should choose a right to send its father
+TreeNode *get(TreeNode *root,int v){
+    tnode *tmp = nullptr,*tmp1,*tmp2;
+    if(root -> val == v) tmp = root;
+    if(root -> left) {
+        tmp1 = get(root -> left,v);
+        if(tmp1 != nullptr) 
+            tmp = tmp1;
+    }
+    if(root -> right) {
+        tmp2 = get(root -> right,v);
+        if(tmp2 != nullptr)
+            tmp = tmp2;
+    }
+    return tmp;
+}
+
+bool judge(TreeNode *root,int v){
+    if(root -> val == v) return true;
+    if(root -> left && judge(root -> left,v)) return true;
+    if(root -> right && judge(root -> right,v)) return true;
+    return false;
+}
+
+TreeNode* getp(TreeNode *root,int v){
+    tnode *tmp = nullptr,*tmp1 = nullptr,*tmp2 = nullptr;
+    if(root -> left){
+        if(root -> left -> val == v) tmp = root;
+        else tmp1 = getp(root -> left,v);
+    }
+    if(root -> right){
+        if(root -> right -> val == v) tmp = root;
+        else tmp2 = getp(root -> right,v);
+    }
+    if(tmp1 != nullptr){
+        tmp = tmp1;
+    }
+    if(tmp2 != nullptr){
+        tmp = tmp2;
+    }
+    return tmp;
+}
+
+void swapnode(tnode *root,int x,int y){
+    TreeNode *tx = get(root,x),*ty = get(root,y);
+    // 直接判断一棵树的子树有没有另外一个节点即可
+    assert(tx != nullptr && ty != nullptr);
+    if(!judge(tx,y) && !judge(ty,x)) {
+        // swap
+        TreeNode *xp = getp(root,x);
+        TreeNode *yp = getp(root,y);
+
+        int dx = (xp -> right == tx) ? 1 : 0;
+        int dy = (yp -> right == ty) ? 1 : 0;
+
+        if(dx){
+            xp -> right = ty;
+        }else{
+            xp -> left = ty;
+        }
+        if(dy){
+            yp -> right = tx;
+        }else{
+            yp -> left = tx;
+        }
+    }
+}
+
 void lastprint(tnode *root){
     dfs(root);
     vector<vector<int> > level(mxdep + 1);
@@ -138,9 +210,14 @@ int main(){
     construct(root,level);
     beautyformat(level);
 
+    // just swap the two node in the tree
+    int x = 1,y = 2;
+    swapnode(root,x,y);
+    lastprint(root);
 
-
-    
+    x = 1,y = 6;
+    swapnode(root,x,y);
+    lastprint(root);
 
     return 0;
 }

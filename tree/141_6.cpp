@@ -12,6 +12,7 @@ a template of binary tree
 #include <algorithm>
 #include <random>
 #include <assert.h>
+#include <unordered_map>
 
 using namespace std;
 
@@ -127,6 +128,43 @@ void lastprint(tnode *root){
     beautyformat(level);
 }
 
+tnode * buildpi(int pl,int pr,int il,int ir,vector<int> &preorder,
+vector<int> &inorder,unordered_map<int,int> pos){
+    if(pl > pr) return nullptr;
+    assert(pr - pl == ir - il);
+    if(pl == pr){
+        return new tnode(preorder[pl]);
+    }
+    tnode *root = new tnode(preorder[pl]);
+    int inp = pos[preorder[pl]];
+    int leftlen = inp - il,rightlen = ir - inp;
+    /*
+    preorder: pl,(pl + 1,inp - il + pl),(inp - il + pl + 1,pr)
+    inorder: (il,inp - 1),inp,(inp + 1,ir)
+    */
+    root -> left = buildpi(pl + 1,inp - il + pl,il,inp - 1,preorder,inorder,pos);
+    root -> right = buildpi(inp - il + pl + 1,pr,inp + 1,ir,preorder,inorder,pos);
+    return root;
+}
+
+tnode *buildip(int pl,int pr,int il,int ir,vector<int> &postorder,vector<int> &inorder,unordered_map<int,int> &pos){
+    if(pl > pr) return nullptr;
+    assert(pr - pl == ir - il);
+    if(pl == pr){
+        return new tnode(postorder[pr]);
+    }
+    tnode *root = new tnode(postorder[pr]);
+    int inp = pos[postorder[pr]];
+    int leftlen = inp - il,rightlen = ir - inp;
+    /*
+    preorder: (pl,pl + inp - il -1),(pl + inp - il,pr - 1),pr
+    inorder: (il,inp - 1),inp,(inp + 1,ir)
+    */
+    root -> left = buildip(pl,pl + inp - il -1,il,inp - 1,postorder,inorder,pos);
+    root -> right = buildip(pl + inp - il,pr - 1,inp + 1,ir,postorder,inorder,pos);
+    return root;
+}
+
 int main(){
     /* 
     the form of the input is use level traverse and we should display the NULL op for each node
@@ -138,10 +176,30 @@ int main(){
     vector<vector<int> > level(mxdep + 1);
     construct(root,level);
     beautyformat(level);
+    /* 
+    use preorder and inorder to construct tree
+    preorder : root , (part of left son) , (part of right son)
+    inorder  : (part of left son) , root , (part of right son)
+    */
+    string pre = "ABCDEFG";
+    string in = "BADCFGE";
+    string post = "BDGFECA";
 
+    int n = pre.size();
+    vector<int> preorder,inorder,postorder;
+    for(int i = 0;i < n;i ++){
+        preorder.push_back(pre[i] - 'A');
+        inorder.push_back(in[i] - 'A');
+        postorder.push_back(post[i] - 'A');
+    }
+    unordered_map<int,int> pos;
+    for(int i = 0;i < n;i ++){
+        pos[inorder[i]] = i;
+    }
+    tnode *new_r = buildpi(0,n - 1,0,n - 1,preorder,inorder,pos);
+    lastprint(new_r);
 
-
-    
-
+    new_r = buildip(0,n - 1,0,n - 1,postorder,inorder,pos);
+    lastprint(new_r);
     return 0;
 }

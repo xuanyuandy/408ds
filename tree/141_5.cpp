@@ -11,6 +11,7 @@ a template of binary tree
 #include <sstream>
 #include <algorithm>
 #include <random>
+#include <queue>
 
 using namespace std;
 
@@ -29,6 +30,8 @@ typedef struct TreeNode{
     TreeNode(int x, int u) : val(x), tag(u), dep(1), left(nullptr), right(nullptr) {}
     TreeNode(int x, int u, TreeNode *left, TreeNode *right) : val(x), tag(u), dep(1), left(left), right(right) {}
 }tnode;
+
+typedef pair<tnode *,int> pti;
 
 // now the method building the binary tree is preorder traverse when meet the '#' end this branch 
 void build(tnode *&u){
@@ -126,6 +129,56 @@ void lastprint(tnode *root){
     beautyformat(level);
 }
 
+int getheightbfs(tnode *root){ 
+    int res = 0;
+    queue<pti> q;
+    pti tmp; tmp.first = root,tmp.second = 1;
+    q.push(tmp);  
+    while(!q.empty()){
+        pti t = q.front();
+        q.pop();
+        tnode *ne;
+        if(t.first -> left){
+            ne = t.first -> left;
+            pti tmp; tmp.first = ne,tmp.second = t.second + 1;
+            res = max(res,tmp.second);
+            q.push(tmp);
+        }
+        if(t.first -> right){
+            ne = t.first -> right;
+            pti tmp; tmp.first = ne,tmp.second = t.second + 1;
+            res = max(res,tmp.second);
+            q.push(tmp);
+        }
+    }
+    return res;
+}
+
+int getheightpointer(tnode *root){
+    if(root == nullptr) return 0;
+    int hh = 0,tt = -1;
+    tnode *q[1010];
+    q[++ tt] = root;
+    tnode *last = root;
+    int level = 1;
+    while(hh <= tt){
+        tnode *t = q[hh ++];
+        if(t -> left){
+            q[++ tt] = t -> left;
+        }
+        if(t -> right){
+            q[++ tt] = t -> right;
+        }
+        if(last == t && hh <= tt ){
+            last = q[tt];
+            cout << char('A' + last -> val) << endl;
+            level ++;
+        }
+    }
+    return level;
+}
+
+
 int main(){
     /* 
     the form of the input is use level traverse and we should display the NULL op for each node
@@ -140,11 +193,10 @@ int main(){
 
 
     // get the length of the tree in no recursive method
+    // we just use the level traversal 
     
-
-
-
-    
+    cout << getheightbfs(root) << endl;
+    cout << getheightpointer(root) << endl;
 
     return 0;
 }

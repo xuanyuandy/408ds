@@ -156,6 +156,13 @@ void Inorder(tnode *u){
     cout << endl;
 }
 
+/*
+analysis the stack condition of the post traversal
+the first push is while(u = u -> left) 
+the second push beacause this node have right son
+the condition that node who have right node can be printed is that
+its 
+*/
 // the Post-order traversal using stack
 void Postorder(tnode *u){
     printf("Postorder :\n");
@@ -187,7 +194,6 @@ void Postorder(tnode *u){
 
 
 // Morris traversal method 
-
 /*
 the main difference of the Pre and In is the first time or second time visit the node
 */
@@ -247,6 +253,7 @@ void MorrisIn(tnode *u){
 }
 
 // this need a new root node to make sure the last incline node can be printed
+// the method it print is -45 bias just (the direction of vector (-1,1))
 void MorrisPost(tnode *u){
     tnode *root = new(tnode);
     root -> left = u;
